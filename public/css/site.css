@@ -1,0 +1,154 @@
+/*Estilos específicos para la aplicación, fuera de los definidos por BOOTSTRAP*/
+
+/*Estilo para los enlaces de las cabeceras ordenadoras de tablas*/
+a.orderby {
+  color: #FFF !important;
+  text-decoration: none;
+}
+
+/*Estilo para añadir icono de mano a aquellos objetos que estén activos*/
+.activo {
+  cursor:pointer;
+}
+
+/*Estilo para ocultar objetos*/
+.hidden {
+  visibility:hidden;
+}
+
+/*Estilo para poner con fondo amarillo a los jugadores lesionados*/
+.lesionado {
+  background-color:yellow;
+}
+
+/*Estilos para los grupos y los equipos de la gestión de grupos*/
+.grupoContainer {
+  margin:0px;
+  padding:5px;
+}
+
+.grupoContainer > h4 {
+  padding:5px;
+  background-color:#000;
+  color:#fff;
+  margin-bottom:0px;
+}
+
+.equipoGrupo {
+  padding:5px;
+  background-color:#eee;
+  border:1px solid #ccc;
+  cursor:pointer;
+}
+/*Fin de estilos de los grupos y equipos de la gestión de grupos*/
+
+/*Estilos para los equiops y emparejamientos de la gestión de jornadas*/
+.dragContainer {
+  margin:0px;
+  padding:0px;
+  margin-bottom:10px;
+}
+
+.dragContainer > h4, .dragContainer > h5 {
+  padding:5px;
+  background-color:#000;
+  color:#fff;
+  margin-bottom:0px;
+}
+
+.dragContainer > h5 {
+  border-top:1px solid #fff;
+}
+
+.equiposContainer {
+  text-align:center;
+}
+
+.vs {
+  text-align:center;
+}
+
+.emparejamientoContainer {
+  margin-bottom:10px;
+  background-color:#fff;
+}
+
+.emparejamientoContainer > .dragContainer {
+  background-color:#ddd;
+  border:1px solid #eee;
+  height:35px;
+}
+
+.equiposContainer > h4 {
+  padding:5px;
+  text-align:center;
+  background-color:#000;
+  color:#fff;
+  margin-bottom:10px;
+}
+
+.equipoJornada {
+  padding:5px;
+  background-color:#eee;
+  border:1px solid #ccc;
+  cursor:pointer;
+}
+
+/*Fin de estilos equipos y emparejamientos de la gestión de jornadas*/
+
+/* Estilos para el calendario */
+  .weekHeader {
+    padding:5px;
+    background-color:#000;
+    color:#fff;
+    margin-top:10px;
+    font-size:1.5em;
+  }
+
+  .weekMatch {
+    padding:5px;
+    background-color:#ddd;
+    text-align:center;
+    font-size:1.4em;
+    border:1px solid #eee;
+  }
+/* Fin de estilos para el calendario */
+
+/* Estilos para las actas */
+
+.acta {
+  border-bottom:1px solid black;
+  border-left:1px solid #555;
+  border-right:1px solid #555;
+  padding:0px;
+  margin-bottom:10px;
+}
+
+.actaHeader {
+  padding:5px;
+  background-color:#000;
+  color:#fff;
+  font-size:1.5em;
+  text-align:center;
+}
+
+.acta > form > table, .acta > table {
+  text-align:center;
+  margin-bottom:0px;
+}
+
+#inducements {
+  width:100%;
+}
+
+.annotationsTable > tbody > tr > td {
+  text-align: left;
+}
+
+.eraseAnnotation {
+  color:red;
+  cursor:pointer;
+  float:right;
+}
+
+/* Fin de estilos para las actas */
