@@ -80,7 +80,7 @@ class validateTeams extends FormRequest
         return [
               'numero' => 'required|numeric|min:1|max:16',
               'nombre' => 'required|max:255',
-              'posicion' => 'required|numeric|min:1|max:106'
+              'posicion' => 'required|numeric|min:1|max:107'
         ];
       }
     }
