@@ -9,14 +9,49 @@
 
                 <div class="card-body">
                     <h3>Lista de equipos</h3>
+                    <div class="card card-body buscador form-group">
+                      <form id="buscador" method="post" action="{{ url('/equipos/lista') }}" />
+                        @csrf
+                        <div class="col-md-6 float-left form-group">
+                          <label for="nombre">Nombre </label>
+                          <input class="form-control" type="text" value="{{ $nombre }}" id="nombre" name="nombre" placeholder="Nombre del equipo"/>
+                          <label for="valoracionDesde">Valoración desde</label>
+                          <input class="form-control" type="text" value="{{ $valoracionDesde }}" id="valoracionDesde" name="valoracionDesde" />
+                        </div>
+                        <div class="col-md-6 float-left form-group">
+                          <label for="raza">Raza</label>
+                          <select class="form-control" name="raza">
+                            <option value="0" @if($raza == "0")selected="selected"@endif></option>
+                            @foreach($razas as $currentRace)
+                              <option value="{{ $currentRace->id }}" @if($raza == $currentRace->id)selected="selected"@endif>
+                                {{ $currentRace->nombre }}
+                              </option>
+                            @endforeach
+                          </select>
+                          <label for="valoracionHasta">Valoración hasta</label>
+                          <input class="form-control" type="text" value="{{ $valoracionHasta }}" id="valoracionHasta" name="valoracionHasta" />
+                        </div>
+                        <input type="hidden" name="sort" value="{{ $sort }}" />
+                        <input type="hidden" name="ascdesc" value="{{ $ascdesc }}" />
+                        <input type="hidden" name="page" value="{{ $page }}" />
+                        <div class="form-group float-right">
+                          <span class="reset btn btn-primary">Limpiar</span>
+                          <button class="submit btn btn-primary">Buscar</button>
+                        </div>
+                      </form>
+                    </div>
+                    <div style="text-align:right;">
+                      <a href="{{ url('/equipos/crear') }}"><button class="btn btn-primary">Crear equipo</button></a>
+                    </div>
+                    <br/>
                     <table class="table table-bordered table-hover">
                       <thead class="thead-dark">
                         <tr>
-                          @sortedTableHeader(/equipos/lista, nombre, Nombre, {$page})
-                          @sortedTableHeader(/equipos/lista, raza, Raza, {$page})
-                          @sortedTableHeader(/equipos/lista, valoracion, Valoracion, {$page})
+                          @sortedTableHeader(/equipos/lista, nombre, Nombre, {$page}, nombre|raza|valoracionDesde|valoracionHasta, {$nombre}|{$raza}|{$valoracionDesde}|{$valoracionHasta})
+                          @sortedTableHeader(/equipos/lista, raza, Raza, {$page}, nombre|raza|valoracionDesde|valoracionHasta, {$nombre}|{$raza}|{$valoracionDesde}|{$valoracionHasta})
+                          @sortedTableHeader(/equipos/lista, valoracion, Valoracion, {$page}, nombre|raza|valoracionDesde|valoracionHasta, {$nombre}|{$raza}|{$valoracionDesde}|{$valoracionHasta})
                           @if (Auth::user()->rol != 3)
-                            @sortedTableHeader(/equipos/lista, usuario, Dueño, {$page})
+                            @sortedTableHeader(/equipos/lista, usuario, Dueño, {$page}, nombre|raza|valoracionDesde|valoracionHasta, {$nombre}|{$raza}|{$valoracionDesde}|{$valoracionHasta})
                           @endif
                           <th scope="col"></th>
                         </tr>
@@ -48,7 +83,8 @@
                         @endforeach
                       <tbody>
                     </table>
-                    {{ $teams->appends(['sort' => $sort, 'ascdesc' => $ascdesc])->links() }}
+                    {{ $teams->appends(['nombre' => $nombre, 'raza' => $raza, 'valoracionDesde' => $valoracionDesde,
+                      'valoracionHasta' => $valoracionHasta, 'sort' => $sort, 'ascdesc' => $ascdesc])->links() }}
 
                     <div class="float-right">
                       <a href="{{ url('/equipos/crear') }}"><button class="btn btn-primary">Crear equipo</button></a>

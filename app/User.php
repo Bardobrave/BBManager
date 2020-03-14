@@ -61,16 +61,42 @@ class User extends Authenticatable
      * @param request con las características de la búsqueda (ordenacion, paginado)
      * @return array con los datos que requerirá la vista para constuir el listado
      */
-    public static function listAll(listaRequest $request) {
+    public static function listAll(listaRequest $request, $listaRoles) {
+      //Recolección de parámetros de búsqueda y paginación
       $sort = $request->input('sort');
       $ascdesc = $request->input('ascdesc');
       $page = $request->input('page');
+      $name = $request->input('name');
+      $email = $request->input('email');
+      $estado = $request->input('estado');
+      $rol = $request->input('rol');
+
+      //Filtrado de resultados en base a los parámetros obtenidos
+      $users = User::take(User::count());
+
+      if ($name != null)
+        $users = $users->where('name', 'LIKE', '%'.$name.'%');
+
+      if ($email != null)
+        $users = $users->where('email', 'LIKE', '%'.$email.'%');
+
+      if ($estado != null && $estado != "Todos")
+        $users = ($estado == "Activos") ? $users->where('activo', 1)
+          : $users->where('activo', 0);
+
+      if ($rol != 0)
+        $users = $users->where('rol', $rol);
+
       if ($sort != null)
-        $users = User::orderBy($sort, $ascdesc)->paginate(10);
+        $users = $users->orderBy($sort, $ascdesc)->paginate(10);
       else
-        $users = User::paginate(10);
-      return ["users" => $users, "sort" => $sort,
-        "ascdesc" => $ascdesc, "page" => ($page == null) ? 1 : $page];
+        $users = $users->paginate(10);
+
+      //Retorno del conjunto de usuarios y los parámetros memorizados
+      return [ "users" => $users, "name" => $name, "email" => $email,
+        "estado" => $estado, "rol" => $rol, "sort" => $sort,
+        "ascdesc" => $ascdesc, "page" => ($page == null) ? 1 : $page,
+        "roles" => $listaRoles ];
     }
 
     /**

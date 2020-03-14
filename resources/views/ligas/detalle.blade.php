@@ -172,7 +172,7 @@
                               <div id="jornada_{{ $jornada->numJornada }}">
                                 <div class="weekHeader col-md-12 float-left">
                                   JORNADA {{ $jornada->numjornada }} {{ $jornada->observaciones }}
-                                  @if(!$league->abierta && !$league->finalizada && $jornada->doesntHave('matches.teams'))
+                                  @if(Auth::user()->rol != 3 && !$league->abierta && !$league->finalizada && $jornada->doesntHave('matches.teams'))
                                     <span class="float-right">
                                       <a href="{{ url('/jornadas/editar/'.$jornada->id) }}" class="fas fa-edit" title="Editar jornada"></a>
                                       <a href="{{ url('/jornadas/eliminar/'.$jornada->id) }}" class="fas fa-trash-alt" title="Borrar jornada"></a>

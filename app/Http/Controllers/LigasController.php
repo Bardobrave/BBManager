@@ -123,8 +123,9 @@ public function edit($id) {
     //Se carga la liga
     $league = League::find($id);
 
-    //Sólo administradores y comisionados pueden editar ligas
-    if ($league != null && $this->userRol != 3) {
+    //Sólo administradores y comisionados pueden editar ligas que no se hayan iniciado
+    if ($league != null && $this->userRol != 3 && !$league->iniciada
+      && !$league->finalizada) {
       return view('ligas/editar', ["league" => $league]);
     } else {
       return redirect('home');

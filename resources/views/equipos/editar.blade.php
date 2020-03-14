@@ -15,7 +15,7 @@
                 <div class="card-body">
                   @if ($errors->any())
                     <div class="alert alert-danger">
-                      Hay errores en los datos enviados a través del formulario 
+                      Hay errores en los datos enviados a través del formulario
                     </div>
                   @endif
                   <form method="post" action="{{ url('/equipos/editar/'.$team->id) }}">
@@ -37,7 +37,7 @@
                           @endforeach
                         </select>
                       @else
-                        <span><strong>{{ $team->race->nombre }}</strong></span>
+                        <div><strong>{{ $team->race->nombre }}</strong></div>
                         <input type="hidden" value="{{ $team->raza }}" id="raza" name="raza"/>
                       @endif
                       @error('raza')
@@ -46,10 +46,15 @@
                     </div>
                     <div class="form-group col-md-12">
                       <label for="presupuesto">Presupuesto inicial del equipo </label>
-                      <input class="form-control @error('presupuesto') is-invalid @enderror @if ($team->activo == 1) readonly @endif" type="number" value="{{ $team->presupuesto }}" id="presupuesto" name="presupuesto" placeholder="Indica de cuánto dinero dispone el equipo para empezar"/>
-                      @error('presupuesto')
-                        <small class="field-validation-error form-text alert-danger" id="presupuestoErrorMsg">{{ $message }}</small>
-                      @enderror
+                      @if (!$team->activo)
+                        <input class="form-control @error('presupuesto') is-invalid @enderror @if ($team->activo == 1) readonly @endif" type="number" value="{{ $team->presupuesto }}" id="presupuesto" name="presupuesto" placeholder="Indica de cuánto dinero dispone el equipo para empezar"/>
+                        @error('presupuesto')
+                          <small class="field-validation-error form-text alert-danger" id="presupuestoErrorMsg">{{ $message }}</small>
+                        @enderror
+                      @else
+                        <div><strong>{{ $team->presupuesto }}</strong></div>
+                        <input type="hidden" value="{{ $team->presupuesto }}" id="presupuesto" name="presupuesto" />
+                      @endif
                     </div>
                     @if (Auth::user()->rol != 3)
                       <div class="form-group col-md-12">

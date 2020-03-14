@@ -49,13 +49,17 @@ public function create($id) {
     == $match->away->user->id) && $match->local->preparado && $match->away->preparado) {
       //Se crean las dos partes del acta
       $match->createMatchSheet($match->local->id, $match->away->id);
+      //Se debe refrescar el partido para que se carguen en el objeto las nuevas actas
+      $match->refresh();
 
       //Si el usuario en sesión es un jugador, se redirige a su parte del acta
       if ($this->userRol == 3) {
         if ($this->userId == $match->local->user->id)
-          $sheet = MatchTeam::find($match->teams->where("equipo", $match->local->id));
+          $sheet = MatchTeam::find($match->teams->where("equipo",
+            $match->local->id)->first()->id);
         else
-          $sheet = MatchTeam::find($match->teams->where("equipo", $match->away->id));
+          $sheet = MatchTeam::find($match->teams->where("equipo",
+            $match->away->id)->first()->id);
 
         return view('actas/editar', ["sheet" => $sheet]);
       } else
@@ -79,7 +83,7 @@ public function edit($id) {
 
     /*Sólo administradores, comisionados y el jugador dueño de esa sección,
     pueden editar el acta, y el jugador sólo si no se ha finalizado */
-    if ($this->userRol != 3 || ($sheet->equipo->user->id == $this->userId
+    if ($this->userRol != 3 || ($sheet->team->user->id == $this->userId
       && !$sheet->actafinalizada)) {
       return view('actas/editar', ["sheet" => $sheet]);
     } else {
@@ -99,7 +103,7 @@ public function saveEdit($id, Request $request) {
 
   /*Sólo administradores, comisionados y el jugador dueño de esa sección,
   pueden editar el acta, y el jugador sólo si no se ha finalizado */
-  if ($this->userRol != 3 || ($sheet->equipo->user->id == $this->userId
+  if ($this->userRol != 3 || ($sheet->team->user->id == $this->userId
     && !$sheet->actafinalizada)) {
     $sheet->edit($request);
     return redirect('/actas/detalle/'.$sheet->match->id);

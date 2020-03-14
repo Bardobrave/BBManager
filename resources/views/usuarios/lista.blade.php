@@ -9,13 +9,52 @@
 
                 <div class="card-body">
                     <h3>Lista de usuarios</h3>
+                    <div class="card card-body buscador form-group">
+                      <form id="buscador" method="post" action="{{ url('/usuarios/lista') }}" />
+                        @csrf
+                        <div class="col-md-6 float-left form-group">
+                          <label for="name">Nombre </label>
+                          <input class="form-control" type="text" value="{{ $name }}" id="name" name="name" placeholder="Nombre del usuario"/>
+                          <label for="estado">Estado</label>
+                          <select class="form-control" name="estado">
+                            <option value="Todos" @if($estado == "Todos") selected="selected" @endif>Todos</option>
+                            <option value="Activos" @if($estado == "Activos") selected="selected" @endif>Activos</option>
+                            <option value="Inactivos" @if($estado == "Inactivos") selected="selected" @endif>Inactivos</option>
+                          </select>
+                        </div>
+                        <div class="col-md-6 float-left form-group">
+                          <label for="email">Email</label>
+                          <input class="form-control" type="text" value="{{ $email }}" id="email" name="email" placeholder="Dirección de correo" />
+                          <label for="rol">Rol</label>
+                          <select class="form-control" name="rol">
+                            <option value="0" @if($rol == "0")selected="selected"@endif></option>
+                            @foreach($roles as $currentRol)
+                              <option value="{{ $currentRol->id }}" @if($rol == $currentRol->id)selected="selected"@endif>
+                                {{ $currentRol->nombre }}
+                              </option>
+                            @endforeach
+                          </select>
+                        </div>
+                        <input type="hidden" name="sort" value="{{ $sort }}" />
+                        <input type="hidden" name="ascdesc" value="{{ $ascdesc }}" />
+                        <input type="hidden" name="page" value="{{ $page }}" />
+                        <div class="form-group float-right">
+                          <span class="reset btn btn-primary">Limpiar</span>
+                          <button class="submit btn btn-primary">Buscar</button>
+                        </div>
+                      </form>
+                    </div>
+                    <div style="text-align:right;">
+                      <a href="crear"><span class="btn btn-primary">Nuevo usuario</span></a>
+                    </div>
+                    <br/>
                     <table class="table table-bordered table-hover">
                       <thead class="thead-dark">
                         <tr>
-                          @sortedTableHeader(/usuarios/lista, name, Nombre, {$page})
-                          @sortedTableHeader(/usuarios/lista, email, Email, {$page})
-                          @sortedTableHeader(/usuarios/lista, activo, Activo, {$page})
-                          @sortedTableHeader(/usuarios/lista, rol, Rol, {$page})
+                          @sortedTableHeader(/usuarios/lista, name, Nombre, {$page}, name|email|estado|rol, {$name}|{$email}|{$estado}|{$rol})
+                          @sortedTableHeader(/usuarios/lista, email, Email, {$page}, name|email|estado|rol, {$name}|{$email}|{$estado}|{$rol})
+                          @sortedTableHeader(/usuarios/lista, activo, Activo, {$page}, name|email|estado|rol, {$name}|{$email}|{$estado}|{$rol})
+                          @sortedTableHeader(/usuarios/lista, rol, Rol, {$page}, name|email|estado|rol, {$name}|{$email}|{$estado}|{$rol})
                           <th scope="col"></th>
                         </tr>
                       </thead>
@@ -45,7 +84,8 @@
                         @endforeach
                       <tbody>
                     </table>
-                    {{ $users->appends(['sort' => $sort, 'ascdesc' => $ascdesc])->links() }}
+                    {{ $users->appends(['sort' => $sort, 'ascdesc' => $ascdesc, 'name' => $name,
+                      'email' => $email, 'estado' => $estado, 'rol' => $rol])->links() }}
                     <div style="text-align:right;">
                       <a href="crear"><span class="btn btn-primary">Nuevo usuario</span></a>
                     </div>
