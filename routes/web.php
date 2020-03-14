@@ -32,6 +32,7 @@ Route::get('/usuarios', function (){
 Route::get('/usuarios/crear', 'UsuariosController@create');
 Route::post('/usuarios/crear', 'UsuariosController@saveCreate');
 Route::get('/usuarios/lista', 'UsuariosController@list');
+Route::post('/usuarios/lista', 'UsuariosController@list');
 Route::get('/usuarios/detalle/{id}', 'UsuariosController@detail');
 Route::get('/usuarios/editar/{id}', 'UsuariosController@edit');
 Route::post('/usuarios/editar/{id}', 'UsuariosController@saveEdit');
@@ -59,6 +60,7 @@ Route::get('/equipos/checkNombreJugadorRepetido/{nombre}/{idEquipo}/{idJugador?}
 Route::get('/equipos/crear', 'EquiposController@create');
 Route::post('/equipos/crear', 'EquiposController@saveCreate');
 Route::get('/equipos/lista', 'EquiposController@list');
+Route::post('/equipos/lista', 'EquiposController@list');
 Route::get('/equipos/listaPorUsuario/{id}', 'EquiposController@listByUser');
 Route::get('/equipos/detalle/{id}', 'EquiposController@detail');
 Route::get('/equipos/editar/{id}', 'EquiposController@edit');

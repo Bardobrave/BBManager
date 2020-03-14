@@ -75,7 +75,7 @@ class UsuariosController extends Controller
             se almacena en sesión como última página visitada */
           session(['lastVisited' => '/usuarios/lista']);
 
-          return view('usuarios/lista', User::listAll($request));
+          return view('usuarios/lista', User::listAll($request, Rol::all()));
         } else {
           return redirect('usuarios/detail/'.$this->userId);
         }

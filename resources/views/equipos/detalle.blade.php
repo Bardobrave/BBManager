@@ -16,7 +16,26 @@
             <div class="card">
                 <div class="card-header">Detalle del equipo</div>
                 <div class="card-body">
+                    @if (session("warning") != "")
+                      <div class="alert alert-danger" role="alert">
+                        {{ session("warning") }}
+                        @php(session(["warning" => ""]))
+                      </div>
+                    @endif
                     <h3>{{ $team->nombre }}</h3>
+                    <div style="text-align:right">
+                      @if ($permisoEdicion)
+                        <a href="{{ url('/equipos/editar/'.$team->id) }}"><button class="btn btn-primary">Editar</button></a>
+                        @if ($canHirePlayers)
+                          <button id="showPlayerModal" class="btn btn-primary" data-toggle="modal" data-target="#addPlayer">Comprar jugador</button>
+                        @endif
+                        @if ($team->activo == 0 && $team->players->count() >= 11)
+                          <a href="{{ url('/equipos/activar/'.$team->id) }}"><button class="btn btn-warning">Activar</button></a>
+                        @elseif ($team->activo == 1 && $team->preparado == 0)
+                          <button id="showPrepareModal" class="btn btn-success" data-toggle="modal" data-target="#warnPreparation">Preparado para jugar</button></a>
+                        @endif
+                      @endif
+                    </div>
                     <div class="tab-content" id="infoEquipo">
                       <ul class="nav nav-tabs" id="team-tab" role="tablist">
                         <li class="nav-item">

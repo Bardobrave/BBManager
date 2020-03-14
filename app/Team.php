@@ -35,7 +35,6 @@ class Team extends Model {
 
     protected $table = 'EQUIPOS';
 
-
 //Definición de relaciones del modelo------------------------------------------
 
     /*
@@ -172,8 +171,10 @@ class Team extends Model {
 
       /*Si el número del jugador no está repetido entre los activos, su
         nombre no está repetido en el equipo y su posición está libre, se añade*/
+      /*Es necesario recurrir a una comparación sobre mayúsculas forzada porque parece
+        que laravel, de algún modo, está ignorando el collation case insensitive de la bc*/
       if ($this->players->where("numero", $request->input("numero"))->where("activo", 1)->count() == 0
-         && $this->players->where("nombre", $request->input("nombre"))->count() == 0
+         && $this->players()->whereRaw("UPPER(nombre) = '".strtoupper($request->input("nombre"))."'")->count() == 0
          && $this->players->where("posicion", $request->input("posicion"))->where("activo", 1)->count()
            < $this->race->positionals->find($request->input("posicion"))->maximo) {
 
@@ -186,9 +187,11 @@ class Team extends Model {
         $this->spike();
 
         $this->save();
-      }
+      } else
+        session(["warning" => "Has intentado añadir un jugador con nombre o "
+          ."número repetido, o con una posición que ya no está disponible"]);
 
-      return $idPlayer;
+      return $this;
     }
 
     /**
@@ -273,17 +276,19 @@ class Team extends Model {
         estaría obteniendo dinero de forma fraudulenta. Los administradores y los
         comisionados pueden editar este valor sin restricciones, dando por sentado que
         saben lo que se hacen*/
-      $diferencia = $this->presupuesto - $request->input('presupuesto');
-      if ($userRol != 3 || $diferencia < 0 || $diferencia < $this->tesoreria + $this->banco) {
-        $this->presupuesto = $request->input('presupuesto');
+      if (!$this->activo) {
+        $diferencia = $this->presupuesto - $request->input('presupuesto');
+        if ($userRol != 3 || $diferencia < 0 || $diferencia < $this->tesoreria + $this->banco) {
+          $this->presupuesto = $request->input('presupuesto');
 
-        //Al alterar el presupuesto original hay que alterar la tesoreria
-        if ($diferencia < 0) {
-          //Si la diferencia es negativa se está aumentando el presupuesto
-          $this->tesoreria -= $diferencia; //Restamos el valor negativo, obteniendo una suma
-        } else {
-          //Si la diferencia es positiva se debe "gastar" dicha diferencia
-          $this->spend($diferencia);
+          //Al alterar el presupuesto original hay que alterar la tesoreria
+          if ($diferencia < 0) {
+            //Si la diferencia es negativa se está aumentando el presupuesto
+            $this->tesoreria -= $diferencia; //Restamos el valor negativo, obteniendo una suma
+          } else {
+            //Si la diferencia es positiva se debe "gastar" dicha diferencia
+            $this->spend($diferencia);
+          }
         }
       }
 
@@ -328,7 +333,7 @@ class Team extends Model {
        $this->delete();
      }
 
-    /*
+    /**
      * Método para despedir a un jugador
      *
      * @param player jugador que se va a despedir
@@ -387,15 +392,39 @@ class Team extends Model {
      * @return array con los datos que requerirá la vista para constuir el listado
      */
     public static function listAll(controllerRequest $request) {
+      //Recoger datos del request
       $sort = $request->input('sort');
       $ascdesc = $request->input('ascdesc');
       $page = $request->input('page');
+      $nombre = $request->input('nombre');
+      $raza = $request->input('raza');
+      $valoracionDesde = $request->input('valoracionDesde');
+      $valoracionHasta = $request->input('valoracionHasta');
+
+      //Filtrado de los datos
+      $teams = Team::take(Team::count());
+
+      if ($nombre != null)
+        $teams = $teams->where('nombre', 'LIKE', '%'.$nombre.'%');
+
+      if ($raza != 0)
+        $teams = $teams->where('raza', $raza);
+
+      if ($valoracionDesde != "" && is_numeric($valoracionDesde))
+        $teams = $teams->where('valoracion', '>=', $valoracionDesde);
+
+      if ($valoracionHasta != "" && is_numeric($valoracionHasta))
+        $teams = $teams->where('valoracion', '<=', $valoracionHasta);
+
       if ($sort != null)
-        $teams = Team::orderBy($sort, $ascdesc)->paginate(10);
+        $teams = $teams->orderBy($sort, $ascdesc)->paginate(10);
       else
-        $teams = Team::paginate(10);
-      return ["teams" => $teams, "sort" => $sort,
-        "ascdesc" => $ascdesc, "page" => ($page == null) ? 1 : $page];
+        $teams = $teams->paginate(10);
+
+      return ["teams" => $teams, "nombre" => $nombre, "raza" => $raza,
+        "valoracionDesde" => $valoracionDesde, "valoracionHasta" => $valoracionHasta,
+        "razas" => Race::all(), "sort" => $sort, "ascdesc" => $ascdesc,
+        "page" => ($page == null) ? 1 : $page];
     }
 
     /**
@@ -531,8 +560,15 @@ class Team extends Model {
     */
     public function spike() {
       $acumulado = 0;
-      $acumulado += Team::find($this->id)->players->where('activo', 1)->where('muerto', 0)
-       ->where('lesionado', 0)->sum('precio'); //Hay que traer el equipo de bd por si se ha actualizado
+      $players = Team::find($this->id)->players(); //Hay que traer el equipo de bd por si se ha actualizado
+      $acumulado += $players->where('activo', 1)->where('muerto', 0)
+       ->where('lesionado', 0)->sum('precio');
+
+       //Hay que restar el valor base de los jugadores con la habilidad desechable
+       $acumulado -= $players->whereHas('skills', function($query) {
+         $query->where("nombre", "DESECHABLE");
+       })->where('activo', 1)->where('muerto', 0)->where('lesionado', 0)->select('position')->sum('precio');
+
       $acumulado += ($this->rerolls * $this->race->costerr);
       $acumulado += ($this->ayudantes * 10000);
       $acumulado += ($this->animadoras * 10000);
